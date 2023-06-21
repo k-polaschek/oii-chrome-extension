@@ -1,6 +1,6 @@
 {
-  "name": "Open in IntelliJ Extension for DevOps Platforms",
-  "description": "Enables DevOps platforms to open referenced files in IntelliJ.",
+  "name": "Oii",
+  "description": "Enables code review platforms to open referenced files in IntelliJ IDEA.",
   "version": "1.0",
   "manifest_version": 3,
   "content_scripts": [
