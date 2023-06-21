@@ -1,0 +1,13 @@
+{
+  "name": "Open in IntelliJ Extension for DevOps Platforms",
+  "description": "Enables DevOps platforms to open referenced files in IntelliJ.",
+  "version": "1.0",
+  "manifest_version": 3,
+  "content_scripts": [
+    {
+      "matches": ["https://dev.azure.com/*/pullrequest/*"],
+      "js": ["azure.js"],
+      "css": ["azure.css"]
+    }
+  ]
+}
