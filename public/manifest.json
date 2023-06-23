@@ -9,5 +9,11 @@
       "js": ["azure.js"],
       "css": ["azure.css"]
     }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [ "oii.png" ],
+      "matches": [ "https://*/*" ]
+    }
   ]
 }

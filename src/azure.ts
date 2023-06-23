@@ -1,15 +1,64 @@
 import axios, {AxiosError} from "axios";
 
+let intro = true;
+
+const createOii = () => {
+    const ul = document.createElement("ul");
+    const img = document.createElement("img");
+    const div = document.createElement("div");
+
+    ul.id = "oii-conversation"
+
+    img.id = "oii-wizard";
+    img.src = chrome.runtime.getURL("oii.png");
+
+    div.id = "oii-wizard-wrapper";
+    div.append(ul);
+    div.append(img);
+
+    document.body.append(div);
+};
+
+const letOiiTalk = (message: String, delay?: number, condition?: Function) => {
+    setTimeout(() => {
+        if (!condition || condition()) {
+            const li = document.createElement("li");
+
+            li.className = "oii";
+            li.innerText = message.toString();
+
+            setTimeout(() => {
+                li.parentNode?.removeChild(li);
+            }, 10000);
+
+            document.getElementById("oii-conversation")?.append(li);
+        }
+    }, delay ?? 0);
+}
+
+const letYouTalk = (message: String, delay?: number, condition?: Function) => {
+    setTimeout(() => {
+        if (!condition || condition()) {
+            const li = document.createElement("li");
+
+            li.className = "you";
+            li.innerText = message.toString();
+
+            setTimeout(() => {
+                li.parentNode?.removeChild(li);
+            }, 10000);
+
+            document.getElementById("oii-conversation")?.append(li);
+        }
+    }, delay ?? 0);
+}
+
 const makeMagic = () => {
     const targets = findTargets();
 
     targets.forEach(target => {
         enchantTarget(target);
     });
-};
-
-const logSomething = (message: String) => {
-    console.log("(oii) " + message);
 };
 
 const findTargets = (): HTMLElement[] => {
@@ -28,14 +77,19 @@ const enchantTarget = (parent: HTMLElement) => {
         const file = getFile(parent);
         const line = getLine(parent);
 
+        letYouTalk("Oii, please open this file for me.");
+
+        if(intro) {
+            letOiiTalk("Someone is impatient. Well...", 500)
+            intro = false;
+        }
+
         if (file === undefined || line === undefined) {
-            // todo: add some animation to the button, e.g. shaking, flashing red
-            logSomething("Oops. Something went wrong while parsing the filename and line. ╭∩╮(⋟﹏⋞)╭∩╮")
+            letOiiTalk("Oops. My senses seem to be a bit clouded at the moment. I cannot recognize the file information.", 500)
             return;
         }
 
-        logSomething("Abracadabra, sim sala bim, to the file he desires I will take him. ✲´*。.❄¨¯`*✲。❄。*。¨¯`*✲");
-        logSomething("Trying to open " + file + " at line " + line + " in IntelliJ IDEA.");
+        letOiiTalk("Abracadabra, sim sala bim, to the file he desires I will take him.", 500);
 
         openFile(file, line);
     });
@@ -44,8 +98,6 @@ const enchantTarget = (parent: HTMLElement) => {
     div.append(span);
 
     parent.append(div);
-
-    logSomething("Enchanted! ᕙ(⇀‸↼‶)ᕗ")
 };
 
 const getFile = (parent: HTMLElement): String | undefined => {
@@ -81,28 +133,36 @@ const openFile = (file: String, line: String) => {
         }
     ).then(
         response => {
-            logSomething("IntelliJ responded with " + response.statusText + ".");
+            if (response.status !== 200) {
+                letOiiTalk("Oops. Something went wrong. IntelliJ responded with status " + response.statusText + " (" + response.status + ").", 1000);
+            }
         },
         reason => {
-            // TODO: show error message
             if ((reason as AxiosError).code == "ERR_NETWORK") {
-                logSomething("Oops. Something went wrong while opening the file. ╭∩╮(⋟﹏⋞)╭∩╮");
-                logSomething("Please make sure you have opened IntelliJ IDEA.");
+                letOiiTalk("My power seems not to be strong enough. You have to help me a little bit. Please make sure you have opened IntelliJ IDEA.", 1000);
             } else {
-                logSomething("Oops. An unexpected error occurs: " + reason);
+                letOiiTalk("Obscure forces seem to interfere with my magic. You can find the reason in the log.", 1000);
+                console.log("Obscure force: " + reason);
             }
         }
     );
 }
+createOii();
 
-logSomething("Do you want some magic? Yes, of course you do. ٩(^‿^)۶")
+letOiiTalk("Do you want some magic?", 2000, (): boolean => intro);
+letYouTalk("Yes, of course I do.", 4000, (): boolean => intro);
+letOiiTalk("So, tell me what I can do for you.", 6000, (): boolean => intro);
+
+setTimeout(() => {
+    intro = false;
+}, 6000);
 
 const observer = new MutationObserver(() => {
     makeMagic();
 });
 
 Array.from(document
-    .getElementsByClassName("activity-feed-list"))
+    .getElementsByClassName("page-content"))
     .map(element => (element as HTMLElement))
     .forEach(feedList => observer.observe(feedList, {
         attributes: true,
