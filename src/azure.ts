@@ -4,11 +4,11 @@ const makeMagic = () => {
     const targets = findTargets();
 
     targets.forEach(target => {
-        enchantTarget(target);
+        empowerTarget(target);
     });
 };
 
-const logSomething = (message: String) => {
+const logSomething = (message: any) => {
     console.log("(oii) " + message);
 };
 
@@ -19,7 +19,7 @@ const findTargets = (): HTMLElement[] => {
         .filter(element => element.getElementsByClassName("open-in-intellij").length == 0);
 };
 
-const enchantTarget = (parent: HTMLElement) => {
+const empowerTarget = (parent: HTMLElement) => {
     const div = document.createElement("div");
     const span = document.createElement("span");
 
@@ -29,12 +29,11 @@ const enchantTarget = (parent: HTMLElement) => {
         const line = getLine(parent);
 
         if (file === undefined || line === undefined) {
-            // todo: add some animation to the button, e.g. shaking, flashing red
-            logSomething("Oops. Something went wrong while parsing the filename and line. ╭∩╮(⋟﹏⋞)╭∩╮")
+            // todo: show error message
+            logSomething("Oops. Something went wrong while parsing the filename and line.")
             return;
         }
 
-        logSomething("Abracadabra, sim sala bim, to the file he desires I will take him. ✲´*。.❄¨¯`*✲。❄。*。¨¯`*✲");
         logSomething("Trying to open " + file + " at line " + line + " in IntelliJ IDEA.");
 
         openFile(file, line);
@@ -44,8 +43,6 @@ const enchantTarget = (parent: HTMLElement) => {
     div.append(span);
 
     parent.append(div);
-
-    logSomething("Enchanted! ᕙ(⇀‸↼‶)ᕗ")
 };
 
 const getFile = (parent: HTMLElement): String | undefined => {
@@ -86,8 +83,7 @@ const openFile = (file: String, line: String) => {
         reason => {
             // TODO: show error message
             if ((reason as AxiosError).code == "ERR_NETWORK") {
-                logSomething("Oops. Something went wrong while opening the file. ╭∩╮(⋟﹏⋞)╭∩╮");
-                logSomething("Please make sure you have opened IntelliJ IDEA.");
+                logSomething("Oops. Something went wrong while opening the file. Please make sure you have opened IntelliJ IDEA.");
             } else {
                 logSomething("Oops. An unexpected error occurs: " + reason);
             }
@@ -95,7 +91,7 @@ const openFile = (file: String, line: String) => {
     );
 }
 
-logSomething("Do you want some magic? Yes, of course you do. ٩(^‿^)۶")
+logSomething("Azure DevOps Platform detected.")
 
 const observer = new MutationObserver(() => {
     makeMagic();
